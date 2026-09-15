@@ -14,12 +14,21 @@ class Patrimonio {
   final String responsavel;
 
   factory Patrimonio.fromJson(Map<String, dynamic> json) {
+    final payload = json['data'] is Map<String, dynamic>
+        ? Map<String, dynamic>.from(json['data'] as Map)
+        : json;
+
     return Patrimonio(
-      id: json['id'] ?? json['codigo'] ?? json['_id'],
-      numeroInventario: _text(json, ['numero_inventario', 'numeroInventario', 'inventario']),
-      descricao: _text(json, ['descricao', 'description']),
-      local: _text(json, ['local', 'localizacao', 'location']),
-      responsavel: _text(json, ['responsavel', 'responsible']),
+      id: payload['id'] ?? payload['codigo'] ?? payload['_id'],
+      numeroInventario: _text(payload, [
+        'numero_inventario',
+        'numeroInventario',
+        'inventario',
+        'numeroInventarioPatrimonio',
+      ]),
+      descricao: _text(payload, ['descricao', 'description']),
+      local: _text(payload, ['local', 'localizacao', 'location']),
+      responsavel: _text(payload, ['responsavel', 'responsible', 'usuario']),
     );
   }
 

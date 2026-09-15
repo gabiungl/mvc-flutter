@@ -11,6 +11,8 @@ class PatrimonioController extends GetxController {
   final patrimonios = <Patrimonio>[].obs;
   final carregando = false.obs;
   final erro = ''.obs;
+  final carregandoDetalhe = false.obs;
+  final erroDetalhe = ''.obs;
   final pesquisaController = TextEditingController();
 
   @override
@@ -32,11 +34,17 @@ class PatrimonioController extends GetxController {
   }
 
   Future<Patrimonio?> buscar(dynamic id) async {
+    carregandoDetalhe.value = true;
+    erroDetalhe.value = '';
     try {
-      return await apiService.buscarPorId(id);
+      final item = await apiService.buscarPorId(id);
+      return item;
     } catch (exception) {
+      erroDetalhe.value = _mensagem(exception);
       _mostrarErro(exception);
       return null;
+    } finally {
+      carregandoDetalhe.value = false;
     }
   }
 

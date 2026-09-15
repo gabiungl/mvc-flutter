@@ -14,11 +14,15 @@ class ApiService {
         : {'q': pesquisa.trim()};
     final response = await http.get(_uri(resource, query));
     _ensureSuccess(response);
+
     final decoded = jsonDecode(response.body);
-    final values = decoded is List
+    final items = decoded is List
         ? decoded
-        : (decoded['items'] ?? decoded['data'] ?? decoded['patrimonios'] ?? []);
-    return (values as List)
+        : (decoded is Map ? (decoded['items'] ?? decoded['data'] ?? decoded['patrimonios'] ?? []) : []);
+
+    final list = items is List ? items : [items];
+    return list
+        .whereType<Map>()
         .map((item) => Patrimonio.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
@@ -26,7 +30,11 @@ class ApiService {
   Future<Patrimonio> buscarPorId(dynamic id) async {
     final response = await http.get(_uri('$resource/$id'));
     _ensureSuccess(response);
-    return Patrimonio.fromJson(Map<String, dynamic>.from(jsonDecode(response.body)));
+
+    final decoded = jsonDecode(response.body);
+    final payload = decoded is Map ? decoded : {'data': decoded};
+    final data = payload['data'] is Map ? payload['data'] : payload;
+    return Patrimonio.fromJson(Map<String, dynamic>.from(data));
   }
 
   Future<Patrimonio> criar(Patrimonio patrimonio) async {
