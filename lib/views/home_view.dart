@@ -106,7 +106,13 @@ class _PatrimonioCard extends StatelessWidget {
         ),
         isThreeLine: true,
         trailing: const Icon(Icons.chevron_right),
-        onTap: () => Get.to(() => DetalheView(patrimonio: patrimonio)),
+        onTap: () {
+          if (patrimonio.id == null || patrimonio.id.toString().trim().isEmpty) {
+            Get.snackbar('Patrimônio inválido', 'Este item não possui identificador válido.');
+            return;
+          }
+          Get.to(() => DetalheView(patrimonio: patrimonio));
+        },
       ),
     );
   }

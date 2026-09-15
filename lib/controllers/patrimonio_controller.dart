@@ -37,6 +37,9 @@ class PatrimonioController extends GetxController {
     carregandoDetalhe.value = true;
     erroDetalhe.value = '';
     try {
+      if (id == null || id.toString().trim().isEmpty) {
+        throw Exception('Identificador do patrimônio não informado');
+      }
       final item = await apiService.buscarPorId(id);
       return item;
     } catch (exception) {

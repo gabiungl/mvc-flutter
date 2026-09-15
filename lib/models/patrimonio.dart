@@ -14,13 +14,12 @@ class Patrimonio {
   final String responsavel;
 
   factory Patrimonio.fromJson(Map<String, dynamic> json) {
-    final payload = json['data'] is Map<String, dynamic>
-        ? Map<String, dynamic>.from(json['data'] as Map)
-        : json;
+    final payload = _unwrapPayload(json);
 
     return Patrimonio(
-      id: payload['id'] ?? payload['codigo'] ?? payload['_id'],
+      id: _first(payload, ['id', 'codigo', '_id', 'patrimonio_id', 'patrimonioId']),
       numeroInventario: _text(payload, [
+        'n_do_inventario',
         'numero_inventario',
         'numeroInventario',
         'inventario',
@@ -32,14 +31,43 @@ class Patrimonio {
     );
   }
 
+  static Map<String, dynamic> _unwrapPayload(Map<String, dynamic> json) {
+    final candidates = [json['data'], json['patrimonio'], json['item'], json['result']];
+    for (final candidate in candidates) {
+      if (candidate is Map) {
+        return Map<String, dynamic>.from(candidate);
+      }
+    }
+    return json;
+  }
+
+  static dynamic _first(Map<String, dynamic> payload, List<String> keys) {
+    for (final key in keys) {
+      final value = payload[key];
+      if (value != null) return value;
+    }
+    return null;
+  }
+
+  static bool fromJsonMapLooksLikePatrimonio(Map<dynamic, dynamic> map) {
+    return map.containsKey('id') ||
+        map.containsKey('codigo') ||
+        map.containsKey('_id') ||
+        map.containsKey('n_do_inventario') ||
+        map.containsKey('numero_inventario') ||
+        map.containsKey('numeroInventario') ||
+        map.containsKey('descricao');
+  }
+
   Map<String, dynamic> toJson() {
     return {
-      'numero_inventario': numeroInventario,
+      'n_do_inventario': numeroInventario,
       'descricao': descricao,
       'local': local,
       'responsavel': responsavel,
     };
   }
+
 
   static String _text(Map<String, dynamic> json, List<String> keys) {
     for (final key in keys) {
